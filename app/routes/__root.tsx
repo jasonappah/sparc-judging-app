@@ -5,6 +5,8 @@ import {
 } from "@tanstack/react-router";
 import { Meta, Scripts } from "@tanstack/start";
 import type { ReactNode } from "react";
+import "@radix-ui/themes/styles.css";
+import { Container, Theme, ThemePanel } from "@radix-ui/themes";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -17,7 +19,7 @@ export const Route = createRootRoute({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "TanStack Start Starter",
+				title: "SPARC Judging App",
 			},
 		],
 	}),
@@ -27,7 +29,12 @@ export const Route = createRootRoute({
 function RootComponent() {
 	return (
 		<RootDocument>
-			<Outlet />
+			<Theme accentColor="ruby">
+				<Container size="1">
+					<Outlet />
+					<ThemePanel />
+				</Container>
+			</Theme>
 		</RootDocument>
 	);
 }
