@@ -8,14 +8,10 @@ import {
 	Table,
 	Text,
 } from "@radix-ui/themes";
-import { createFileRoute } from "@tanstack/react-router";
+import { useCallback } from "react";
 import { type PropsWithChildren, useMemo, useState } from "react";
 
-export const Route = createFileRoute("/")({
-	component: Home,
-});
-
-function Home() {
+export function ScoringSheet() {
 	const bot1Color = "pink";
 	const bot2Color = "indigo";
 	const bot1 = "Rorshach";
@@ -117,19 +113,19 @@ function Home() {
 		};
 	}, [damageSummary, engagementScoreSummary]);
 
-	const clearDamageTiers = () => {
+	const clearDamageTiers = useCallback(() => {
 		setBot1DamageTier(undefined);
 		setBot2DamageTier(undefined);
-	};
+	}, []);
 
-	const clearEngagementScore = () => {
+	const clearEngagementScore = useCallback(() => {
 		setEngagementScore([-1]);
-	};
+	}, []);
 
-	const clearAll = () => {
+	const clearAll = useCallback(() => {
 		clearDamageTiers();
 		clearEngagementScore();
-	};
+	}, [clearDamageTiers, clearEngagementScore]);
 	return (
 		<Flex gap="3" direction="column">
 			<Heading size="7">
