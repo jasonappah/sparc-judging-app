@@ -32,7 +32,6 @@ function RootComponent() {
 			<Theme accentColor="ruby">
 				<Container size="1">
 					<Outlet />
-					<ThemePanel />
 				</Container>
 			</Theme>
 		</RootDocument>
