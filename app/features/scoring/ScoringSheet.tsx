@@ -1,25 +1,44 @@
 import {
 	Badge,
+	type BadgeProps,
 	Button,
 	Flex,
 	Heading,
 	RadioGroup,
-	Slider,
 	Table,
 	Text,
 } from "@radix-ui/themes";
 import { useCallback } from "react";
-import { type PropsWithChildren, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { DualColorSlider } from "./DualColorSlider";
 
-export function ScoringSheet() {
-	const bot1Color = "pink";
-	const bot2Color = "indigo";
-	const bot1 = "Rorshach";
-	const bot2 = "Knuckle Sandwich";
-	const bot2Badge = <Badge color={bot2Color}>{bot2}</Badge>;
-	const bot1Badge = <Badge color={bot1Color}>{bot1}</Badge>;
+type ScoringSheetProps = {
+	bot1: string;
+	bot2: string;
+	bot1Color: BadgeProps["color"];
+	bot2Color: BadgeProps["color"];
+};
+
+type DamageTier = keyof typeof damageTiers;
+
+export function ScoringSheet(props: ScoringSheetProps) {
+	const { bot1, bot2, bot1Color, bot2Color } = props;
+	const bot2Badge = useMemo(
+		() => <Badge color={bot2Color}>{bot2}</Badge>,
+		[bot2, bot2Color],
+	);
+	const bot1Badge = useMemo(
+		() => <Badge color={bot1Color}>{bot1}</Badge>,
+		[bot1, bot1Color],
+	);
 
 	const [engagementScore, setEngagementScore] = useState<[number]>([-1]);
+	const [bot1DamageTier, setBot1DamageTier] = useState<
+		DamageTier | undefined
+	>();
+	const [bot2DamageTier, setBot2DamageTier] = useState<
+		DamageTier | undefined
+	>();
 
 	const engagementScoreSummary = useMemo(() => {
 		if (engagementScore[0] === -1) return null;
@@ -77,15 +96,6 @@ export function ScoringSheet() {
 		}
 	}, [engagementScoreSummary, bot1Badge, bot2Badge]);
 
-	// TODO: it would be semantially correct to wrap all the inputs in a form
-
-	const [bot1DamageTier, setBot1DamageTier] = useState<
-		keyof typeof damageTiers | undefined
-	>();
-	const [bot2DamageTier, setBot2DamageTier] = useState<
-		keyof typeof damageTiers | undefined
-	>();
-
 	const damageSummary = useMemo(() => {
 		if (bot1DamageTier === undefined || bot2DamageTier === undefined)
 			return null;
@@ -127,88 +137,83 @@ export function ScoringSheet() {
 		clearEngagementScore();
 	}, [clearDamageTiers, clearEngagementScore]);
 	return (
-		<Flex gap="3" direction="column">
-			<Heading size="7">
-				{bot1} vs {bot2}
-			</Heading>
-			<Button onClick={clearAll}>Clear All Scores</Button>
-			<Flex justify="between">
-				<Heading size="4">Damage</Heading>
-				{damageSummary && (
-					<Text>
-						{damageSummary.bot1DamageScore} - {damageSummary.bot2DamageScore}
-					</Text>
-				)}
-			</Flex>
-			<Button variant="outline" onClick={clearDamageTiers}>
-				Clear Damage Tiers
-			</Button>
-			<DamageScoring
-				robotName={bot1}
-				damageTierValue={bot1DamageTier}
-				setDamageTier={setBot1DamageTier}
-			/>
-			<DamageScoring
-				robotName={bot2}
-				damageTierValue={bot2DamageTier}
-				setDamageTier={setBot2DamageTier}
-			/>
-			<Flex justify="between">
-				<Heading size="4">Engagement</Heading>
-				{engagementScoreSummary && (
-					<Text>
-						{engagementScoreSummary.bot1EngagementScore} -{" "}
-						{engagementScoreSummary.bot2EngagementScore}
-					</Text>
-				)}
-			</Flex>
-			<Button variant="outline" onClick={clearEngagementScore}>
-				Clear Engagement Score
-			</Button>
-			<Flex gap="1">
-				<Badge color={bot1Color}>{bot1}</Badge>
-				{/* TODO: change slider track/range color to match bot colors */}
-				<Slider
-					color={
-						engagementScoreSummary
-							? engagementScoreSummary.bot1IsUp
-								? bot1Color
-								: bot2Color
-							: undefined
-					}
-					size="3"
-					min={1}
-					max={6}
-					value={engagementScore}
-					onValueChange={(v) => setEngagementScore(v as [number])}
-				/>
-				<Badge color={bot2Color}>{bot2}</Badge>
-			</Flex>
-			{engagementExplanation}
-			{scoreSummary && (
-				<>
-					<Heading size="4">Summary</Heading>
-					{scoreSummary ? (
+		<form>
+			<Flex gap="3" direction="column">
+				<Heading size="7">
+					{bot1} vs {bot2}
+				</Heading>
+				<Button onClick={clearAll}>Clear All Scores</Button>
+				<Flex justify="between">
+					<Heading size="4">Damage</Heading>
+					{damageSummary && (
 						<Text>
-							{bot1Badge} {scoreSummary.bot1Score} - {scoreSummary.bot2Score}{" "}
-							{bot2Badge}
+							{damageSummary.bot1DamageScore} - {damageSummary.bot2DamageScore}
 						</Text>
-					) : (
-						<Text>&nbsp;</Text>
 					)}
-				</>
-			)}
-		</Flex>
+				</Flex>
+				<Button variant="outline" onClick={clearDamageTiers}>
+					Clear Damage Tiers
+				</Button>
+				<DamageScoring
+					robotName={bot1}
+					damageTierValue={bot1DamageTier}
+					setDamageTier={setBot1DamageTier}
+				/>
+				<DamageScoring
+					robotName={bot2}
+					damageTierValue={bot2DamageTier}
+					setDamageTier={setBot2DamageTier}
+				/>
+				<Flex justify="between">
+					<Heading size="4">Engagement</Heading>
+					{engagementScoreSummary && (
+						<Text>
+							{engagementScoreSummary.bot1EngagementScore} -{" "}
+							{engagementScoreSummary.bot2EngagementScore}
+						</Text>
+					)}
+				</Flex>
+				<Button variant="outline" onClick={clearEngagementScore}>
+					Clear Engagement Score
+				</Button>
+				<Flex gap="1">
+					<Badge color={bot1Color}>{bot1}</Badge>
+					{/* TODO: change slider track/range color to match bot colors */}
+					<DualColorSlider
+						color1={bot1Color}
+						color2={bot2Color}
+						size="3"
+						min={1}
+						max={6}
+						value={engagementScore}
+						onValueChange={(v) => setEngagementScore(v as [number])}
+					/>
+					<Badge color={bot2Color}>{bot2}</Badge>
+				</Flex>
+				{engagementExplanation}
+				{scoreSummary && (
+					<>
+						<Heading size="4">Summary</Heading>
+						{scoreSummary ? (
+							<Text>
+								{bot1Badge} {scoreSummary.bot1Score} - {scoreSummary.bot2Score}{" "}
+								{bot2Badge}
+							</Text>
+						) : (
+							<Text>&nbsp;</Text>
+						)}
+					</>
+				)}
+			</Flex>
+		</form>
 	);
 }
 
-function DamageScoring(
-	props: PropsWithChildren<{
-		robotName: string;
-		damageTierValue: keyof typeof damageTiers | undefined;
-		setDamageTier: (damageTier: keyof typeof damageTiers) => void;
-	}>,
-) {
+function DamageScoring(props: {
+	robotName: string;
+	damageTierValue: DamageTier | undefined;
+	setDamageTier: (damageTier: DamageTier) => void;
+}) {
 	const { robotName, damageTierValue, setDamageTier } = props;
 	return (
 		<>
@@ -216,7 +221,7 @@ function DamageScoring(
 			<RadioGroup.Root
 				variant="soft"
 				onValueChange={(e) => {
-					setDamageTier(e as keyof typeof damageTiers);
+					setDamageTier(e as DamageTier);
 				}}
 				value={damageTierValue}
 			>
@@ -256,7 +261,7 @@ const damageTiers = {
 	E: 5,
 } as const;
 
-const damageTierExplanations: Record<keyof typeof damageTiers, string> = {
+const damageTierExplanations: Record<DamageTier, string> = {
 	A: "No damage, cosmetic damage, or minor damage to purely ablative armor",
 	B: "Significant damage to purely ablative armor, minor damage to mobility systems that do not noticeably hinder movement, damage to structure or armor that does not significantly hinder function.",
 	C: "Damage to the mobility system or weapon system(s) that moderately hinders function, or damage that significantly impairs the function of a robot's structure or armor.",
@@ -268,10 +273,7 @@ type Scores = [number, number];
 
 // Usage: `const [bot1Score, bot2Score] = damageTiersToScores[bot1DamageTier][bot2DamageTier]`
 // Example: If bot1 got an A and bot 2 got a B, get their scores with ``damageTiersToScores['A']['B']
-const damageTiersToScores: Record<
-	keyof typeof damageTiers,
-	Record<keyof typeof damageTiers, Scores>
-> = {
+const damageTiersToScores: Record<DamageTier, Record<DamageTier, Scores>> = {
 	A: {
 		A: [2, 2],
 		B: [2, 2],

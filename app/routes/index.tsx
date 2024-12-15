@@ -1,10 +1,17 @@
-import { ScoringSheet } from '../features/scoring/ScoringSheet'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import { ScoringSheet } from "../features/scoring/ScoringSheet";
 
-export const Route = createFileRoute('/')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/")({
+	component: RouteComponent,
+});
 
 function RouteComponent() {
-  return <ScoringSheet />
+	return (
+		<ScoringSheet
+			bot1="Oblivion"
+			bot2="Impulse"
+			bot1Color="pink"
+			bot2Color="indigo"
+		/>
+	);
 }
