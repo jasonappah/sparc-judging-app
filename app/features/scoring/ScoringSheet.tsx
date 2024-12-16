@@ -180,8 +180,8 @@ export function ScoringSheet(props: ScoringSheetProps) {
 					<Badge color={bot1Color}>{bot1}</Badge>
 					{/* TODO: change slider track/range color to match bot colors */}
 					<DualColorSlider
-						color1={bot1Color}
-						color2={bot2Color}
+						color1={bot2Color}
+						color2={engagementScore === -1 ? undefined : bot1Color}
 						size="3"
 						min={1}
 						max={6}
