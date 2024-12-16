@@ -3,12 +3,12 @@ import {
 	type BadgeProps,
 	Button,
 	Flex,
+	Grid,
 	Heading,
 	RadioGroup,
-	Table,
 	Text,
 } from "@radix-ui/themes";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 import { useMemo, useState } from "react";
 import { DualColorSlider } from "./DualColorSlider";
 
@@ -209,49 +209,55 @@ export function ScoringSheet(props: ScoringSheetProps) {
 	);
 }
 
-function DamageScoring(props: {
+type DamageScoringProps = {
 	robotName: string;
 	damageTierValue: DamageTier | undefined;
 	setDamageTier: (damageTier: DamageTier) => void;
-}) {
-	const { robotName, damageTierValue, setDamageTier } = props;
+};
+
+const DamageScoring = memo(function DamageScoring({
+	robotName,
+	damageTierValue,
+	setDamageTier,
+}: DamageScoringProps) {
+	const onValueChange = useCallback(
+		(e: string) => {
+			setDamageTier(e as DamageTier);
+		},
+		[setDamageTier],
+	);
+
+	const id = useId();
+
 	return (
 		<>
 			<Heading size="2">{robotName}</Heading>
 			<RadioGroup.Root
 				variant="soft"
-				onValueChange={(e) => {
-					setDamageTier(e as DamageTier);
-				}}
+				onValueChange={onValueChange}
 				value={damageTierValue}
 			>
-				<Table.Root>
-					<Table.Body>
-						{Object.entries(damageTierExplanations).map(([dt, explanation]) => (
-							<Table.Row
-								key={dt}
-								onClick={(e) => {
-									const rowEl = e.currentTarget;
-									const radioBtn = rowEl.querySelector("button");
-									radioBtn?.click();
-								}}
-							>
-								<Table.Cell>{dt}</Table.Cell>
-								<Table.Cell>{explanation}</Table.Cell>
-								<Table.Cell>
+				{/* TODO: make this less ugly. maybe copy how the table was styled */}
+				<Grid gap="1" columns="3">
+					{Object.entries(damageTierExplanations).map(([dt, explanation]) => {
+						const k = `${id}-${dt}`;
+						return (
+							<label htmlFor={k} key={k} style={{ display: "contents" }}>
+								<Text>{dt}</Text>
+								<Text>{explanation}</Text>
 									<RadioGroup.Item
+									id={k}
 										checked={dt === damageTierValue}
 										value={dt}
 									/>
-								</Table.Cell>
-							</Table.Row>
-						))}
-					</Table.Body>
-				</Table.Root>
+							</label>
+						);
+					})}
+				</Grid>
 			</RadioGroup.Root>
 		</>
 	);
-}
+});
 
 const damageTiers = {
 	A: 1,
