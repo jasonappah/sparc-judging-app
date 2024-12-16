@@ -10,6 +10,7 @@ import {
 } from "@radix-ui/themes";
 import { useCallback, useId } from "react";
 import { useMemo, useState } from "react";
+import { memo } from "react";
 import { DualColorSlider } from "./DualColorSlider";
 
 type ScoringSheetProps = {
@@ -21,8 +22,12 @@ type ScoringSheetProps = {
 
 type DamageTier = keyof typeof damageTiers;
 
-export function ScoringSheet(props: ScoringSheetProps) {
-	const { bot1, bot2, bot1Color, bot2Color } = props;
+export function ScoringSheet({
+	bot1,
+	bot2,
+	bot1Color,
+	bot2Color,
+}: ScoringSheetProps) {
 	const bot2Badge = useMemo(
 		() => <Badge color={bot2Color}>{bot2}</Badge>,
 		[bot2, bot2Color],
@@ -32,7 +37,11 @@ export function ScoringSheet(props: ScoringSheetProps) {
 		[bot1, bot1Color],
 	);
 
-	const [engagementScore, setEngagementScore] = useState<[number]>([-1]);
+	const [engagementScoreArray, setEngagementScore] = useState<[number]>([-1]);
+	const engagementScore = useMemo(
+		() => engagementScoreArray[0],
+		[engagementScoreArray],
+	);
 	const [bot1DamageTier, setBot1DamageTier] = useState<
 		DamageTier | undefined
 	>();
@@ -41,8 +50,8 @@ export function ScoringSheet(props: ScoringSheetProps) {
 	>();
 
 	const engagementScoreSummary = useMemo(() => {
-		if (engagementScore[0] === -1) return null;
-		const bot1EngagementScore = 5 + 1 - engagementScore[0];
+		if (engagementScore === -1) return null;
+		const bot1EngagementScore = 5 + 1 - engagementScore;
 		const bot2EngagementScore = 5 - bot1EngagementScore;
 		const bot1IsUp = bot1EngagementScore > bot2EngagementScore;
 		return {
@@ -54,7 +63,7 @@ export function ScoringSheet(props: ScoringSheetProps) {
 
 	const engagementExplanation = useMemo(() => {
 		if (!engagementScoreSummary) {
-			return <></>;
+			return null;
 		}
 
 		const {
@@ -136,6 +145,12 @@ export function ScoringSheet(props: ScoringSheetProps) {
 		clearDamageTiers();
 		clearEngagementScore();
 	}, [clearDamageTiers, clearEngagementScore]);
+
+	const onEngagementValueChange = useCallback(
+		(v: [number]) => setEngagementScore(v),
+		[],
+	);
+
 	return (
 		<form>
 			<Flex gap="3" direction="column">
@@ -177,18 +192,17 @@ export function ScoringSheet(props: ScoringSheetProps) {
 					Clear Engagement Score
 				</Button>
 				<Flex gap="1">
-					<Badge color={bot1Color}>{bot1}</Badge>
-					{/* TODO: change slider track/range color to match bot colors */}
+					{bot1Badge}
 					<DualColorSlider
 						color1={bot2Color}
 						color2={engagementScore === -1 ? undefined : bot1Color}
 						size="3"
 						min={1}
 						max={6}
-						value={engagementScore}
-						onValueChange={(v) => setEngagementScore(v as [number])}
+						value={engagementScoreArray}
+						onValueChange={onEngagementValueChange}
 					/>
-					<Badge color={bot2Color}>{bot2}</Badge>
+					{bot2Badge}
 				</Flex>
 				{engagementExplanation}
 				{scoreSummary && (
@@ -245,11 +259,11 @@ const DamageScoring = memo(function DamageScoring({
 							<label htmlFor={k} key={k} style={{ display: "contents" }}>
 								<Text>{dt}</Text>
 								<Text>{explanation}</Text>
-									<RadioGroup.Item
+								<RadioGroup.Item
 									id={k}
-										checked={dt === damageTierValue}
-										value={dt}
-									/>
+									checked={dt === damageTierValue}
+									value={dt}
+								/>
 							</label>
 						);
 					})}
