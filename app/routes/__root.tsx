@@ -6,7 +6,7 @@ import {
 import { Meta, Scripts } from "@tanstack/start";
 import type { ReactNode } from "react";
 import "@radix-ui/themes/styles.css";
-import { Container, Theme, ThemePanel } from "@radix-ui/themes";
+import { Container, Theme } from "@radix-ui/themes";
 
 export const Route = createRootRoute({
 	head: () => ({
