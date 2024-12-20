@@ -2,6 +2,7 @@
 	"name": "sparc-judging",
 	"author": "Jason Antwi-Appah <hey@jasonaa.me>",
 	"license": "Apache-2.0",
+    "private": true,
     "version": "1.0.0",
 	"scripts": {
 		"lint:biome": "biome check",
@@ -17,5 +18,8 @@
 		"@tanstack/eslint-plugin-router": "^1.87.6",
 		"@types/node": "^22.10.2",
 		"eslint-config-biome": "^1.9.4"
-	}
+	},
+    "workspaces": [
+        "apps/*"
+    ]
 }

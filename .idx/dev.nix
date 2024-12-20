@@ -8,6 +8,7 @@
   packages = [
     pkgs.nodejs_20
     pkgs.corepack_20
+    pkgs.openssl
   ];
 
   # Sets environment variables in the workspace
@@ -18,29 +19,21 @@
       "eamodio.gitlens"
       "biomejs.biome"
       "dbaeumer.vscode-eslint"
+      "ofhumanbondage.react-proptypes-intellisense"
+      "mgmcdermott.vscode-language-babel"
+      "wix.vscode-import-cost"
+      "pflannery.vscode-versionlens"
+      "editorconfig.editorconfig"
+      "prisma.prisma"
+      "graphql.vscode-graphql"
     ];
-
-    # Enable previews
-    previews = {
-      enable = true;
-      previews = {
-        web = {
-          command = ["pnpm" "run" "dev" "--port" "$PORT"];
-          manager = "web";
-          env = {
-            PORT = "$PORT";
-          };
-        };
-      };
-    };
 
     # Workspace lifecycle hooks
     workspace = {
       # Runs when a workspace is first created
       onCreate = {
-        pnpm-setup = "pnpm setup";
-        npm-install = "pnpm install";
-        install-ni = "pnpm i -g @antfu/ni";
+        npm-install = "yarn install";
+        install-ni = "yarn i -g @antfu/ni";
       };
     };
   };
