@@ -5,8 +5,8 @@ import {
 } from "@tanstack/react-router";
 import { Meta, Scripts } from "@tanstack/start";
 import type { ReactNode } from "react";
-import "@radix-ui/themes/styles.css";
 import { Container, Theme } from "@radix-ui/themes";
+import css from "@radix-ui/themes/styles.css?url";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -43,6 +43,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 		<html lang="en">
 			<head>
 				<Meta />
+				<link rel="stylesheet" href={css} />
 			</head>
 			<body>
 				{children}

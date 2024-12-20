@@ -1,5 +1,6 @@
 {
 	"name": "sparc-tanstack",
+	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vinxi dev",
