@@ -6,12 +6,13 @@ import {
 	Grid,
 	Heading,
 	RadioGroup,
-	Text,
+	Text
 } from "@radix-ui/themes";
-import { useCallback, useId } from "react";
+import { type ReactNode, useCallback, useId } from "react";
 import { useMemo, useState } from "react";
 import { memo } from "react";
 import { DualColorSlider } from "./DualColorSlider";
+import Tooltip from "../../components/Tooltip";
 
 type ScoringSheetProps = {
 	bot1: string;
@@ -243,6 +244,14 @@ const DamageScoring = memo(function DamageScoring({
 
 	const id = useId();
 
+  const damageTierExplanations: Record<DamageTier, ReactNode> = {
+    A: <Text>No damage, cosmetic damage, or minor damage to <Tooltip content={definitions["purely ablative armor"]}>purely ablative armor</Tooltip></Text>,
+    B: <Text>Significant damage to <Tooltip content={definitions["purely ablative armor"]}>purely ablative armor</Tooltip>, minor damage to mobility systems that do not noticeably hinder movement, damage to structure or armor that does not significantly hinder function.</Text>,
+    C: "Damage to the mobility system or weapon system(s) that moderately hinders function, or damage that significantly impairs the function of a robot's structure or armor.",
+    D: <Text>Significant impairment of drive <span style={{fontWeight: "bold"}}>or</span> weapon systems</Text>,
+    E: <Text>Significant impairment of drive <span style={{fontWeight: "bold"}}>and</span> weapon systems</Text>,
+  };
+
 	return (
 		<>
 			<Heading size="2">{robotName}</Heading>
@@ -251,13 +260,13 @@ const DamageScoring = memo(function DamageScoring({
 				onValueChange={onValueChange}
 				value={damageTierValue}
 			>
-								<Grid gap="1" columns="3rem 1fr 3rem">
+				<Grid gap="1" columns="3rem 1fr 3rem">
 					{Object.entries(damageTierExplanations).map(([dt, explanation]) => {
 						const k = `${id}-${dt}`;
 						return (
 							<label htmlFor={k} key={k} style={{ display: "contents" }}>
 								<Text>{dt}</Text>
-								<Text>{explanation}</Text>
+								{explanation}
 								<RadioGroup.Item
 									id={k}
 									checked={dt === damageTierValue}
@@ -279,14 +288,6 @@ const damageTiers = {
 	D: 4,
 	E: 5,
 } as const;
-
-const damageTierExplanations: Record<DamageTier, string> = {
-	A: "No damage, cosmetic damage, or minor damage to purely ablative armor",
-	B: "Significant damage to purely ablative armor, minor damage to mobility systems that do not noticeably hinder movement, damage to structure or armor that does not significantly hinder function.",
-	C: "Damage to the mobility system or weapon system(s) that moderately hinders function, or damage that significantly impairs the function of a robot's structure or armor.",
-	D: "Significant impairment of drive or weapon systems",
-	E: "Significant impairment of drive and weapon systems",
-};
 
 type Scores = [number, number];
 
@@ -329,3 +330,7 @@ const damageTiersToScores: Record<DamageTier, Record<DamageTier, Scores>> = {
 		E: [2, 2],
 	},
 } as const;
+
+const definitions = {
+  "purely ablative armor": "To qualify as “purely ablative” armor an element must be clearly designed to serve the sole purpose of being damaged or destroyed to absorb damage to protect the main structure of the robot."
+}
