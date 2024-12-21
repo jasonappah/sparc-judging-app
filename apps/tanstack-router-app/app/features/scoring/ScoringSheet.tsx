@@ -152,7 +152,7 @@ export function ScoringSheet({
 	);
 
 	return (
-		<form>
+		<form style={{marginBottom: "25rem"}}>
 			<Flex gap="3" direction="column">
 				<Heading size="7">
 					{bot1} vs {bot2}
@@ -191,7 +191,7 @@ export function ScoringSheet({
 				<Button variant="outline" onClick={clearEngagementScore}>
 					Clear Engagement Score
 				</Button>
-				<Flex gap="1">
+				<Flex gap="1" justify="center" align="center">
 					{bot1Badge}
 					<DualColorSlider
 						color1={bot2Color}
@@ -251,8 +251,7 @@ const DamageScoring = memo(function DamageScoring({
 				onValueChange={onValueChange}
 				value={damageTierValue}
 			>
-				{/* TODO: make this less ugly. maybe copy how the table was styled */}
-				<Grid gap="1" columns="3">
+								<Grid gap="1" columns="3rem 1fr 3rem">
 					{Object.entries(damageTierExplanations).map(([dt, explanation]) => {
 						const k = `${id}-${dt}`;
 						return (
