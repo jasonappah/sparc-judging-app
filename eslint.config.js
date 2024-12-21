@@ -1,5 +1,14 @@
-// TODO: this no worky. need to figure this out
 import pluginRouter from "@tanstack/eslint-plugin-router";
 import biome from "eslint-config-biome";
 
-export default [...pluginRouter.configs["flat/recommended"], biome];
+export default [
+	...pluginRouter.configs["flat/recommended"],
+	{
+		ignores: [
+			"apps/tanstack-router-app/.output/",
+			"apps/tanstack-router-app/.vercel/",
+			"apps/tanstack-router-app/.vinxi/",
+		],
+	},
+	biome,
+];

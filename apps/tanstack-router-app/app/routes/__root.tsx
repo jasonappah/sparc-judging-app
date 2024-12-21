@@ -1,3 +1,6 @@
+import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
+import { Container, Theme } from "@radix-ui/themes";
+import css from "@radix-ui/themes/styles.css?url";
 import {
 	Outlet,
 	ScrollRestoration,
@@ -5,9 +8,6 @@ import {
 } from "@tanstack/react-router";
 import { Meta, Scripts } from "@tanstack/start";
 import type { ReactNode } from "react";
-import { Container, Theme } from "@radix-ui/themes";
-import css from "@radix-ui/themes/styles.css?url";
-import {Provider as TooltipProvider} from "@radix-ui/react-tooltip";
 
 export const Route = createRootRoute({
 	head: () => ({
@@ -31,11 +31,11 @@ function RootComponent() {
 	return (
 		<RootDocument>
 			<Theme accentColor="ruby">
-        <TooltipProvider delayDuration={100}>
-          <Container size="1">
-            <Outlet />
-          </Container>
-        </TooltipProvider>
+				<TooltipProvider delayDuration={100}>
+					<Container size="1">
+						<Outlet />
+					</Container>
+				</TooltipProvider>
 			</Theme>
 		</RootDocument>
 	);
