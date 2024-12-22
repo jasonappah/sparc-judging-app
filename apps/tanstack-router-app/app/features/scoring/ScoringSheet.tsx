@@ -3,7 +3,6 @@ import {
 	type ObservablePrimitive,
 	linked,
 } from "@legendapp/state";
-import { undoRedo } from "@legendapp/state/helpers/undoRedo";
 import { Reactive, observer, useObserve } from "@legendapp/state/react";
 import { useObservable } from "@legendapp/state/react";
 import {
@@ -29,9 +28,8 @@ export const ScoringSheet = observer(function ScoringSheet({
 }: { savedState$: Observable<ScoringSheetState> }) {
 	// TODO: make sure the local state is a copy of the saved state
 	const localState$: Observable<ScoringSheetState> = useObservable(
-		savedState$.get(),
+		structuredClone(savedState$.get()),
 	);
-	const { undo, redo, undos$, redos$ } = undoRedo(localState$, { limit: 100 });
 	const engagementScoreArray$ = useObservable<number[]>(
 		linked({
 			get: () => [localState$.engagementScore.get()],
@@ -167,21 +165,12 @@ export const ScoringSheet = observer(function ScoringSheet({
 		savedState$.set(localState$.get());
 	}, [localState$.get, savedState$.set]);
 
-	// TODO: undo, redo, save doesn't work
+	// TODO: save doesn't work
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			// Check if Ctrl/Cmd key is pressed
 			if (e.ctrlKey || e.metaKey) {
 				switch (e.key.toLowerCase()) {
-					case "z":
-						if (e.shiftKey) {
-							e.preventDefault();
-							redo();
-						} else {
-							e.preventDefault();
-							undo();
-						}
-						break;
 					case "s":
 						e.preventDefault();
 						save();
@@ -192,7 +181,7 @@ export const ScoringSheet = observer(function ScoringSheet({
 
 		window.addEventListener("keydown", handleKeyPress);
 		return () => window.removeEventListener("keydown", handleKeyPress);
-	}, [undo, redo, save]);
+	}, [save]);
 
 	useObserve(() => {
 		console.log("local state changed", localState$.get());
@@ -202,14 +191,6 @@ export const ScoringSheet = observer(function ScoringSheet({
 		<form>
 			<Flex gap="3" direction="column">
 				<Flex gap="1" justify="center" align="center">
-					<Button type="button" onClick={undo} disabled={undos$.get() === 0}>
-						<Undo2 size={16} />
-						Undo
-					</Button>
-					<Button type="button" onClick={redo} disabled={redos$.get() === 0}>
-						<Redo2 size={16} />
-						Redo
-					</Button>
 					<Button
 						type="button"
 						onClick={save}
