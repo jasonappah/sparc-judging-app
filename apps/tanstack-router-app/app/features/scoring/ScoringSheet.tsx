@@ -28,7 +28,6 @@ export const ScoringSheet = observer(function ScoringSheet({
 	savedState$,
 }: { savedState$: Observable<ScoringSheetState> }) {
 	// TODO: make sure the local state is a copy of the saved state
-	// TODO: why does any clear and save button cause the whole page to refresh?
 	const localState$: Observable<ScoringSheetState> = useObservable(
 		savedState$.get(),
 	);
@@ -203,15 +202,19 @@ export const ScoringSheet = observer(function ScoringSheet({
 		<form>
 			<Flex gap="3" direction="column">
 				<Flex gap="1" justify="center" align="center">
-					<Button onClick={undo} disabled={undos$.get() === 0}>
+					<Button type="button" onClick={undo} disabled={undos$.get() === 0}>
 						<Undo2 size={16} />
 						Undo
 					</Button>
-					<Button onClick={redo} disabled={redos$.get() === 0}>
+					<Button type="button" onClick={redo} disabled={redos$.get() === 0}>
 						<Redo2 size={16} />
 						Redo
 					</Button>
-					<Button onClick={save} disabled={unsaved$.get() === false}>
+					<Button
+						type="button"
+						onClick={save}
+						disabled={unsaved$.get() === false}
+					>
 						<Save size={16} />
 						Save
 					</Button>
@@ -222,9 +225,9 @@ export const ScoringSheet = observer(function ScoringSheet({
 					vs
 					<Reactive.input $value={localState$.bot2} />
 				</Flex>
-				<Button onClick={clearAll}>
+				<Button type="button" onClick={clearAll}>
 					<Trash2 size={16} />
-					Clear All Scores
+					Clear All Sections
 				</Button>
 				<Flex justify="between">
 					<Heading size="4">Damage</Heading>
@@ -234,9 +237,9 @@ export const ScoringSheet = observer(function ScoringSheet({
 						</Text>
 					)}
 				</Flex>
-				<Button variant="outline" onClick={clearDamageTiers}>
+				<Button type="button" variant="outline" onClick={clearDamageTiers}>
 					<Trash2 size={16} />
-					Clear Damage Tiers
+					Clear Damage Score
 				</Button>
 				<DamageScoring
 					robotName={localState$.bot1.get()}
@@ -255,7 +258,7 @@ export const ScoringSheet = observer(function ScoringSheet({
 						</Text>
 					)}
 				</Flex>
-				<Button variant="outline" onClick={clearEngagementScore}>
+				<Button type="button" variant="outline" onClick={clearEngagementScore}>
 					<Trash2 size={16} />
 					Clear Engagement Score
 				</Button>
