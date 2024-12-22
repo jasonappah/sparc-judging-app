@@ -9,6 +9,7 @@ export default defineConfig({
 	vite: {
 		plugins: [
 			MillionLint.vite({
+				enabled: false,
 				rsc: true,
 				optimizeDOM: true,
 				experimental: {

@@ -11,14 +11,28 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AppImport } from './routes/app'
 import { Route as IndexImport } from './routes/index'
+import { Route as AppLocalSheetSheetIdImport } from './routes/app.local-sheet.$sheetId'
 
 // Create/Update Routes
+
+const AppRoute = AppImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const AppLocalSheetSheetIdRoute = AppLocalSheetSheetIdImport.update({
+  id: '/local-sheet/$sheetId',
+  path: '/local-sheet/$sheetId',
+  getParentRoute: () => AppRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +46,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppImport
+      parentRoute: typeof rootRoute
+    }
+    '/app/local-sheet/$sheetId': {
+      id: '/app/local-sheet/$sheetId'
+      path: '/local-sheet/$sheetId'
+      fullPath: '/app/local-sheet/$sheetId'
+      preLoaderRoute: typeof AppLocalSheetSheetIdImport
+      parentRoute: typeof AppImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AppRouteChildren {
+  AppLocalSheetSheetIdRoute: typeof AppLocalSheetSheetIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppLocalSheetSheetIdRoute: AppLocalSheetSheetIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/local-sheet/$sheetId': typeof AppLocalSheetSheetIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/local-sheet/$sheetId': typeof AppLocalSheetSheetIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/local-sheet/$sheetId': typeof AppLocalSheetSheetIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/app' | '/app/local-sheet/$sheetId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/app' | '/app/local-sheet/$sheetId'
+  id: '__root__' | '/' | '/app' | '/app/local-sheet/$sheetId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +123,22 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/app"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/app": {
+      "filePath": "app.tsx",
+      "children": [
+        "/app/local-sheet/$sheetId"
+      ]
+    },
+    "/app/local-sheet/$sheetId": {
+      "filePath": "app.local-sheet.$sheetId.tsx",
+      "parent": "/app"
     }
   }
 }

@@ -45,4 +45,4 @@ This will build the app for production to the `dist` directory and start the ser
 - integrate with Challonge to pull next matches + send final results to Challonge
 - link to SPARC Judging Guidelines PDF
 - support SPARC Damage, Control, and Aggression Criteria
-- printable version of a judging 
+- printable version of a judging sheet

@@ -1,5 +1,5 @@
 import { Provider as TooltipProvider } from "@radix-ui/react-tooltip";
-import { Container, Theme } from "@radix-ui/themes";
+import { Theme } from "@radix-ui/themes";
 import css from "@radix-ui/themes/styles.css?url";
 import {
 	Outlet,
@@ -30,11 +30,9 @@ export const Route = createRootRoute({
 function RootComponent() {
 	return (
 		<RootDocument>
-			<Theme accentColor="ruby">
+			<Theme accentColor="gold">
 				<TooltipProvider delayDuration={100}>
-					<Container size="1">
-						<Outlet />
-					</Container>
+					<Outlet />
 				</TooltipProvider>
 			</Theme>
 		</RootDocument>

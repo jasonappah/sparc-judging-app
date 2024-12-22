@@ -1,6 +1,13 @@
 import {
+	type Observable,
+	type ObservablePrimitive,
+	linked,
+} from "@legendapp/state";
+import { undoRedo } from "@legendapp/state/helpers/undoRedo";
+import { Reactive, observer, useObserve } from "@legendapp/state/react";
+import { useObservable } from "@legendapp/state/react";
+import {
 	Badge,
-	type BadgeProps,
 	Button,
 	Flex,
 	Grid,
@@ -8,47 +15,49 @@ import {
 	RadioGroup,
 	Text,
 } from "@radix-ui/themes";
-import { type ReactNode, useCallback, useId } from "react";
-import { useMemo, useState } from "react";
-import { memo } from "react";
+import { Redo2, Save, Trash2, Undo2 } from "lucide-react";
+import { type ReactNode, useCallback, useEffect, useId } from "react";
+import { useMemo } from "react";
 import Tooltip from "../../components/Tooltip";
+import type { DamageTier, ScoringSheetState } from "../../state/observables";
 import { DualColorSlider } from "./DualColorSlider";
 
-type ScoringSheetProps = {
-	bot1: string;
-	bot2: string;
-	bot1Color: BadgeProps["color"];
-	bot2Color: BadgeProps["color"];
-};
+// TODO: why HMR no worky...
 
-type DamageTier = keyof typeof damageTiers;
+export const ScoringSheet = observer(function ScoringSheet({
+	savedState$,
+}: { savedState$: Observable<ScoringSheetState> }) {
+	// TODO: make sure the local state is a copy of the saved state
+	// TODO: why does any clear and save button cause the whole page to refresh?
+	const localState$: Observable<ScoringSheetState> = useObservable(
+		savedState$.get(),
+	);
+	const { undo, redo, undos$, redos$ } = undoRedo(localState$, { limit: 100 });
+	const engagementScoreArray$ = useObservable<number[]>(
+		linked({
+			get: () => [localState$.engagementScore.get()],
+			set: ({ value }) => {
+				localState$.engagementScore.set(value[0]);
+			},
+		}),
+	);
 
-export function ScoringSheet({
-	bot1,
-	bot2,
-	bot1Color,
-	bot2Color,
-}: ScoringSheetProps) {
+	const unsaved$ = useObservable(() => localState$.get() !== savedState$.get());
+
+	const bot1Color = localState$.bot1Color.get();
+	const bot2Color = localState$.bot2Color.get();
+	const engagementScore = localState$.engagementScore.get();
+	const bot1DamageTier = localState$.bot1DamageTier.get();
+	const bot2DamageTier = localState$.bot2DamageTier.get();
+
 	const bot2Badge = useMemo(
-		() => <Badge color={bot2Color}>{bot2}</Badge>,
-		[bot2, bot2Color],
+		() => <Badge color={bot2Color}>{localState$.bot2.get()}</Badge>,
+		[bot2Color, localState$.bot2.get],
 	);
 	const bot1Badge = useMemo(
-		() => <Badge color={bot1Color}>{bot1}</Badge>,
-		[bot1, bot1Color],
+		() => <Badge color={bot1Color}>{localState$.bot1.get()}</Badge>,
+		[bot1Color, localState$.bot1.get],
 	);
-
-	const [engagementScoreArray, setEngagementScore] = useState<[number]>([-1]);
-	const engagementScore = useMemo(
-		() => engagementScoreArray[0],
-		[engagementScoreArray],
-	);
-	const [bot1DamageTier, setBot1DamageTier] = useState<
-		DamageTier | undefined
-	>();
-	const [bot2DamageTier, setBot2DamageTier] = useState<
-		DamageTier | undefined
-	>();
 
 	const engagementScoreSummary = useMemo(() => {
 		if (engagementScore === -1) return null;
@@ -134,13 +143,13 @@ export function ScoringSheet({
 	}, [damageSummary, engagementScoreSummary]);
 
 	const clearDamageTiers = useCallback(() => {
-		setBot1DamageTier(undefined);
-		setBot2DamageTier(undefined);
-	}, []);
+		localState$.bot1DamageTier.set(undefined);
+		localState$.bot2DamageTier.set(undefined);
+	}, [localState$.bot1DamageTier.set, localState$.bot2DamageTier.set]);
 
 	const clearEngagementScore = useCallback(() => {
-		setEngagementScore([-1]);
-	}, []);
+		localState$.engagementScore.set(-1);
+	}, [localState$.engagementScore.set]);
 
 	const clearAll = useCallback(() => {
 		clearDamageTiers();
@@ -148,17 +157,75 @@ export function ScoringSheet({
 	}, [clearDamageTiers, clearEngagementScore]);
 
 	const onEngagementValueChange = useCallback(
-		(v: [number]) => setEngagementScore(v),
-		[],
+		(v: [number]) => {
+			engagementScoreArray$.set(v);
+		},
+		[engagementScoreArray$.set],
 	);
+
+	const save = useCallback(() => {
+		console.log("saving");
+		savedState$.set(localState$.get());
+	}, [localState$.get, savedState$.set]);
+
+	// TODO: undo, redo, save doesn't work
+  useEffect(() => {
+		const handleKeyPress = (e: KeyboardEvent) => {
+			// Check if Ctrl/Cmd key is pressed
+			if (e.ctrlKey || e.metaKey) {
+				switch (e.key.toLowerCase()) {
+					case "z":
+						if (e.shiftKey) {
+							e.preventDefault();
+							redo();
+						} else {
+							e.preventDefault();
+							undo();
+						}
+						break;
+					case "s":
+						e.preventDefault();
+						save();
+						break;
+				}
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyPress);
+		return () => window.removeEventListener("keydown", handleKeyPress);
+	}, [undo, redo, save]);
+
+	useObserve(() => {
+		console.log("local state changed", localState$.get());
+	});
 
 	return (
 		<form style={{ marginBottom: "25rem" }}>
 			<Flex gap="3" direction="column">
-				<Heading size="7">
-					{bot1} vs {bot2}
-				</Heading>
-				<Button onClick={clearAll}>Clear All Scores</Button>
+				<Flex gap="1" justify="center" align="center">
+					<Button onClick={undo} disabled={undos$.get() === 0}>
+						<Undo2 size={16} />
+						Undo
+					</Button>
+					<Button onClick={redo} disabled={redos$.get() === 0}>
+						<Redo2 size={16} />
+						Redo
+					</Button>
+					<Button onClick={save} disabled={unsaved$.get() === false}>
+						<Save size={16} />
+						Save
+					</Button>
+				</Flex>
+				<Flex gap="1" justify="center" align="center">
+					{/* TODO: copy google docs doc title input style */}
+					<Reactive.input $value={localState$.bot1} />
+					vs
+					<Reactive.input $value={localState$.bot2} />
+				</Flex>
+				<Button onClick={clearAll}>
+					<Trash2 size={16} />
+					Clear All Scores
+				</Button>
 				<Flex justify="between">
 					<Heading size="4">Damage</Heading>
 					{damageSummary && (
@@ -168,17 +235,16 @@ export function ScoringSheet({
 					)}
 				</Flex>
 				<Button variant="outline" onClick={clearDamageTiers}>
+					<Trash2 size={16} />
 					Clear Damage Tiers
 				</Button>
 				<DamageScoring
-					robotName={bot1}
-					damageTierValue={bot1DamageTier}
-					setDamageTier={setBot1DamageTier}
+					robotName={localState$.bot1.get()}
+					damageTier={localState$.bot1DamageTier}
 				/>
 				<DamageScoring
-					robotName={bot2}
-					damageTierValue={bot2DamageTier}
-					setDamageTier={setBot2DamageTier}
+					robotName={localState$.bot2.get()}
+					damageTier={localState$.bot2DamageTier}
 				/>
 				<Flex justify="between">
 					<Heading size="4">Engagement</Heading>
@@ -190,6 +256,7 @@ export function ScoringSheet({
 					)}
 				</Flex>
 				<Button variant="outline" onClick={clearEngagementScore}>
+					<Trash2 size={16} />
 					Clear Engagement Score
 				</Button>
 				<Flex gap="1" justify="center" align="center">
@@ -200,7 +267,7 @@ export function ScoringSheet({
 						size="3"
 						min={1}
 						max={6}
-						value={engagementScoreArray}
+						value={engagementScoreArray$.get()}
 						onValueChange={onEngagementValueChange}
 					/>
 					{bot2Badge}
@@ -222,26 +289,20 @@ export function ScoringSheet({
 			</Flex>
 		</form>
 	);
-}
+});
 
 type DamageScoringProps = {
 	robotName: string;
-	damageTierValue: DamageTier | undefined;
-	setDamageTier: (damageTier: DamageTier) => void;
+	damageTier: ObservablePrimitive<DamageTier | undefined>;
 };
 
-const DamageScoring = memo(function DamageScoring({
-	robotName,
-	damageTierValue,
-	setDamageTier,
-}: DamageScoringProps) {
+function DamageScoring({ robotName, damageTier }: DamageScoringProps) {
 	const onValueChange = useCallback(
 		(e: string) => {
-			setDamageTier(e as DamageTier);
+			damageTier.set(e as DamageTier);
 		},
-		[setDamageTier],
+		[damageTier],
 	);
-
 	const id = useId();
 
 	const damageTierExplanations: Record<DamageTier, ReactNode> = {
@@ -285,7 +346,7 @@ const DamageScoring = memo(function DamageScoring({
 			<RadioGroup.Root
 				variant="soft"
 				onValueChange={onValueChange}
-				value={damageTierValue}
+				value={damageTier.get()}
 			>
 				<Grid gap="1" columns="3rem 1fr 3rem">
 					{Object.entries(damageTierExplanations).map(([dt, explanation]) => {
@@ -296,7 +357,7 @@ const DamageScoring = memo(function DamageScoring({
 								{explanation}
 								<RadioGroup.Item
 									id={k}
-									checked={dt === damageTierValue}
+									checked={dt === damageTier.get()}
 									value={dt}
 								/>
 							</label>
@@ -306,15 +367,7 @@ const DamageScoring = memo(function DamageScoring({
 			</RadioGroup.Root>
 		</>
 	);
-});
-
-const damageTiers = {
-	A: 1,
-	B: 2,
-	C: 3,
-	D: 4,
-	E: 5,
-} as const;
+}
 
 type Scores = [number, number];
 

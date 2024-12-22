@@ -1,17 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ScoringSheet } from "../features/scoring/ScoringSheet";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-	component: RouteComponent,
+	// TODO: I'm 90 percent sure there is a way to do this statically
+	loader() {
+		throw redirect({
+			to: "/app",
+		});
+	},
 });
-
-function RouteComponent() {
-	return (
-		<ScoringSheet
-			bot1="Oblivion"
-			bot2="Impulse"
-			bot1Color="pink"
-			bot2Color="indigo"
-		/>
-	);
-}
