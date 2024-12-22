@@ -200,7 +200,7 @@ export const ScoringSheet = observer(function ScoringSheet({
 	});
 
 	return (
-		<form style={{ marginBottom: "25rem" }}>
+		<form >
 			<Flex gap="3" direction="column">
 				<Flex gap="1" justify="center" align="center">
 					<Button onClick={undo} disabled={undos$.get() === 0}>

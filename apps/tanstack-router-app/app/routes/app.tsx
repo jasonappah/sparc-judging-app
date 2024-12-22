@@ -94,13 +94,9 @@ const RouteComponent = observer(function RouteComponent() {
 				<Button disabled>Create Live Scoring Session</Button>
 
 				<Text>
-					Built by <a href="https://jasonaa.me">Jason Antwi-Appah</a> and{" "}
-					<a href="https://github.com/jasonappah/sparc-judging-app/contributors">
-						other contributors
-					</a>
-					. Source code available on{" "}
+					Built by <a href="https://jasonaa.me">Jason Antwi-Appah</a>. Source code available on{" "}
 					<a href="https://github.com/jasonappah/sparc-judging-app">GitHub</a> -
-					currently work in progress :)
+					v1 still a work in progress :)
 				</Text>
 			</Flex>
 			<Outlet />
