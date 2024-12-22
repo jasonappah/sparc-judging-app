@@ -39,8 +39,6 @@ This will build the app for production to the `dist` directory and start the ser
 ## Future work/ideas
 
 - semver versioning + changelog?
-- revisit scoring sheet UI
-- support saving / creating multiple scoring sheets locally
 - add glossary for clarification of judging terminology
 - support synced scoring sessions between multiple judges
 - integrate with Challonge to pull next matches + send final results to Challonge
