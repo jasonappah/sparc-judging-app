@@ -53,5 +53,5 @@ syncObservable(scoringSheets$, {
 	persist: {
 		name: "persistKey",
 		plugin: ObservablePersistLocalStorage,
-	},
+	}
 });

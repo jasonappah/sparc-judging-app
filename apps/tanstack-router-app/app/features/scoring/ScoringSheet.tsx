@@ -14,19 +14,19 @@ import {
 	RadioGroup,
 	Text,
 } from "@radix-ui/themes";
-import { Redo2, Save, Trash2, Undo2 } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useId } from "react";
 import { useMemo } from "react";
 import Tooltip from "../../components/Tooltip";
 import type { DamageTier, ScoringSheetState } from "../../state/observables";
 import { DualColorSlider } from "./DualColorSlider";
+import isEqual from "lodash/isEqual";
 
 // TODO: why HMR no worky...
 
 export const ScoringSheet = observer(function ScoringSheet({
 	savedState$,
 }: { savedState$: Observable<ScoringSheetState> }) {
-	// TODO: make sure the local state is a copy of the saved state
 	const localState$: Observable<ScoringSheetState> = useObservable(
 		structuredClone(savedState$.get()),
 	);
@@ -39,7 +39,11 @@ export const ScoringSheet = observer(function ScoringSheet({
 		}),
 	);
 
-	const unsaved$ = useObservable(() => localState$.get() !== savedState$.get());
+	const unsaved$ = useObservable(() => {
+		const localState = localState$.get();
+		const savedState = savedState$.get();
+		return !isEqual(localState, savedState);
+	});
 
 	const bot1Color = localState$.bot1Color.get();
 	const bot2Color = localState$.bot2Color.get();
@@ -162,13 +166,12 @@ export const ScoringSheet = observer(function ScoringSheet({
 
 	const save = useCallback(() => {
 		console.log("saving");
-		savedState$.set(localState$.get());
+		savedState$.set(structuredClone(localState$.get()));
 	}, [localState$.get, savedState$.set]);
 
-	// TODO: save doesn't work
+
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
-			// Check if Ctrl/Cmd key is pressed
 			if (e.ctrlKey || e.metaKey) {
 				switch (e.key.toLowerCase()) {
 					case "s":
@@ -182,10 +185,6 @@ export const ScoringSheet = observer(function ScoringSheet({
 		window.addEventListener("keydown", handleKeyPress);
 		return () => window.removeEventListener("keydown", handleKeyPress);
 	}, [save]);
-
-	useObserve(() => {
-		console.log("local state changed", localState$.get());
-	});
 
 	return (
 		<form>
