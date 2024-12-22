@@ -1,24 +1,25 @@
+import { For, observer } from "@legendapp/state/react";
 import {
-	For,
-	observer
-} from "@legendapp/state/react";
-import { Button, Flex, Grid, Heading, Table, Text } from "@radix-ui/themes";
+	Button,
+	Code,
+	Flex,
+	Grid,
+	Heading,
+	Table,
+	Text,
+} from "@radix-ui/themes";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
+import TimeAgo from "react-timeago";
 import { decodeTime } from "ulid";
 import { scoringSheets$ } from "../state/observables";
-import TimeAgo from 'react-timeago'
 
 // TODO: mobile responsiveness (hide the first column on mobile + render a button to open/close it)
 
 const RouteComponent = observer(function RouteComponent() {
 	return (
 		<Grid columns="3" gap="5">
-			<Flex
-				direction="column"
-				gap="3"
-				style={{ borderRadius: "0.5rem" }}
-			>
+			<Flex direction="column" gap="3" style={{ borderRadius: "0.5rem" }}>
 				{/* TODO: could be cool to have a randomly selected image from (user-submitted?) matches */}
 				<Flex
 					height="25vh"
@@ -66,13 +67,15 @@ const RouteComponent = observer(function RouteComponent() {
 								const createdAtTs = decodeTime(sheet.id.get());
 								const updatedAt = updatedAtTs ? new Date(updatedAtTs) : null;
 								const createdAt = new Date(createdAtTs);
-                // TODO: add an active indicator to the table
+								// TODO: add an active indicator to the table
 								return (
 									<Table.Row key={sheet.id.get()}>
 										<Table.Cell>
 											{sheet.state.bot1.get()} v {sheet.state.bot2.get()}
 										</Table.Cell>
-										<Table.Cell><TimeAgo date={createdAt} /></Table.Cell>
+										<Table.Cell>
+											<TimeAgo date={createdAt} />
+										</Table.Cell>
 										<Table.Cell>
 											{updatedAt ? <TimeAgo date={updatedAt} /> : "Never"}
 										</Table.Cell>
@@ -94,10 +97,25 @@ const RouteComponent = observer(function RouteComponent() {
 				<Button disabled>Create Live Scoring Session</Button>
 
 				<Text>
-					Built by <a href="https://jasonaa.me">Jason Antwi-Appah</a>. Source code available on{" "}
+					Built by <a href="https://jasonaa.me">Jason Antwi-Appah</a>. Source
+					code available on{" "}
 					<a href="https://github.com/jasonappah/sparc-judging-app">GitHub</a> -
 					v1 still a work in progress :)
 				</Text>
+
+				{process.env.VITE_VERCEL && (
+					<Text>
+						Running{" "}
+						<a
+							href={`https://github.com/jasonappah/sparc-judging-app/commit/${process.env.VITE_VERCEL_GIT_COMMIT_SHA}`}
+						>
+							<Code variant="outline">
+								{process.env.VITE_VERCEL_GIT_COMMIT_SHA || "N/A"}
+							</Code>
+						</a>{" "}
+						({process.env.VITE_VERCEL_GIT_COMMIT_MESSAGE || "N/A"}).
+					</Text>
+				)}
 			</Flex>
 			<Outlet />
 		</Grid>

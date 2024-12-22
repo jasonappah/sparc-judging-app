@@ -169,7 +169,7 @@ export const ScoringSheet = observer(function ScoringSheet({
 	}, [localState$.get, savedState$.set]);
 
 	// TODO: undo, redo, save doesn't work
-  useEffect(() => {
+	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			// Check if Ctrl/Cmd key is pressed
 			if (e.ctrlKey || e.metaKey) {
@@ -200,7 +200,7 @@ export const ScoringSheet = observer(function ScoringSheet({
 	});
 
 	return (
-		<form >
+		<form>
 			<Flex gap="3" direction="column">
 				<Flex gap="1" justify="center" align="center">
 					<Button onClick={undo} disabled={undos$.get() === 0}>
