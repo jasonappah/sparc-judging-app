@@ -39,8 +39,7 @@ const RouteComponent = observer(function RouteComponent() {
 						SPARC Judging App
 					</Heading>
 					<Text size="1" style={{ color: "white", fontStyle: "italic" }}>
-						{/* TODO: find the robot names */}
-						Photo: Comet Robotics, Robot 1 vs Robot 2 @ Comet Clash 2024
+						Photo: Comet Robotics, Whopper v. High Rise at Comet Clash 2024
 					</Text>
 				</Flex>
 
