@@ -13,6 +13,7 @@ import {
 	Heading,
 	RadioGroup,
 	Text,
+  TextField,
 } from "@radix-ui/themes";
 import { Save, Trash2 } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useId } from "react";
@@ -165,7 +166,6 @@ export const ScoringSheet = observer(function ScoringSheet({
 	);
 
 	const save = useCallback(() => {
-		console.log("saving");
 		savedState$.set(structuredClone(localState$.get()));
 	}, [localState$.get, savedState$.set]);
 
@@ -199,11 +199,10 @@ export const ScoringSheet = observer(function ScoringSheet({
 						Save
 					</Button>
 				</Flex>
-				<Flex gap="1" justify="center" align="center">
-					{/* TODO: copy google docs doc title input style */}
-					<Reactive.input $value={localState$.bot1} />
+				<Flex gap="1" justify="between" align="center" style={{width: "100%"}}>
+					<TextField.Root placeholder="Robot 1" variant="soft" color={bot1Color} value={localState$.bot1.get()} onChange={(e)=>localState$.bot1.set(e.target.value)} />
 					vs
-					<Reactive.input $value={localState$.bot2} />
+					<TextField.Root placeholder="Robot 2" variant="soft" color={bot2Color} value={localState$.bot2.get()} onChange={(e)=>localState$.bot2.set(e.target.value)} />
 				</Flex>
 				<Button type="button" onClick={clearAll}>
 					<Trash2 size={16} />
