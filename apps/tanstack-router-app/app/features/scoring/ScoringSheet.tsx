@@ -13,15 +13,15 @@ import {
 	Heading,
 	RadioGroup,
 	Text,
-  TextField,
+	TextField,
 } from "@radix-ui/themes";
+import isEqual from "lodash/isEqual";
 import { Save, Trash2 } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useId } from "react";
 import { useMemo } from "react";
 import Tooltip from "../../components/Tooltip";
 import type { DamageTier, ScoringSheetState } from "../../state/observables";
 import { DualColorSlider } from "./DualColorSlider";
-import isEqual from "lodash/isEqual";
 
 // TODO: why HMR no worky...
 
@@ -169,7 +169,6 @@ export const ScoringSheet = observer(function ScoringSheet({
 		savedState$.set(structuredClone(localState$.get()));
 	}, [localState$.get, savedState$.set]);
 
-
 	useEffect(() => {
 		const handleKeyPress = (e: KeyboardEvent) => {
 			if (e.ctrlKey || e.metaKey) {
@@ -199,10 +198,27 @@ export const ScoringSheet = observer(function ScoringSheet({
 						Save
 					</Button>
 				</Flex>
-				<Flex gap="1" justify="between" align="center" style={{width: "100%"}}>
-					<TextField.Root placeholder="Robot 1" variant="soft" color={bot1Color} value={localState$.bot1.get()} onChange={(e)=>localState$.bot1.set(e.target.value)} />
+				<Flex
+					gap="1"
+					justify="between"
+					align="center"
+					style={{ width: "100%" }}
+				>
+					<TextField.Root
+						placeholder="Robot 1"
+						variant="soft"
+						color={bot1Color}
+						value={localState$.bot1.get()}
+						onChange={(e) => localState$.bot1.set(e.target.value)}
+					/>
 					vs
-					<TextField.Root placeholder="Robot 2" variant="soft" color={bot2Color} value={localState$.bot2.get()} onChange={(e)=>localState$.bot2.set(e.target.value)} />
+					<TextField.Root
+						placeholder="Robot 2"
+						variant="soft"
+						color={bot2Color}
+						value={localState$.bot2.get()}
+						onChange={(e) => localState$.bot2.set(e.target.value)}
+					/>
 				</Flex>
 				<Button type="button" onClick={clearAll}>
 					<Trash2 size={16} />
