@@ -66,7 +66,6 @@ const RouteComponent = observer(function RouteComponent() {
 								const createdAtTs = decodeTime(sheet.id.get());
 								const updatedAt = updatedAtTs ? new Date(updatedAtTs) : null;
 								const createdAt = new Date(createdAtTs);
-								// TODO: add an active indicator to the table
 								return (
 									<Table.Row key={sheet.id.get()}>
 										<Table.Cell>
@@ -79,8 +78,8 @@ const RouteComponent = observer(function RouteComponent() {
 											{updatedAt ? <TimeAgo date={updatedAt} /> : "Never"}
 										</Table.Cell>
 										<Table.Cell>
-											<Link to={`/app/local-sheet/${sheet.id.get()}`}>
-												<Button>Open</Button>
+											<Link to={"/app/local-sheet/$sheetId"} params={{ sheetId: sheet.id.get() }} activeOptions={{includeSearch: false}}>
+                        {({ isActive }) => <Button disabled={isActive}>Open</Button>}
 											</Link>
 										</Table.Cell>
 									</Table.Row>
