@@ -2,7 +2,7 @@ import { observable } from "@legendapp/state";
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
 import { syncObservable } from "@legendapp/state/sync";
 import type { BadgeProps } from "@radix-ui/themes";
-import { ulid } from "ulid";
+import { ulid } from "ulidx";
 
 export const damageTiers = {
 	A: 1,

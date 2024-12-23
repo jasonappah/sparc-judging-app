@@ -11,7 +11,7 @@ import {
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import TimeAgo from "react-timeago";
-import { decodeTime } from "ulid";
+import { decodeTime } from "ulidx";
 import { scoringSheets$ } from "../state/observables";
 
 // TODO: mobile responsiveness (hide the first column on mobile + render a button to open/close it)
