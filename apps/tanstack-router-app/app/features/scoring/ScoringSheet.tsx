@@ -22,6 +22,7 @@ import { useMemo } from "react";
 import Tooltip from "../../components/Tooltip";
 import type { DamageTier, ScoringSheetState } from "../../state/observables";
 import { DualColorSlider } from "./DualColorSlider";
+import { useBlocker } from "@tanstack/react-router";
 
 // TODO: why HMR no worky...
 
@@ -184,6 +185,15 @@ export const ScoringSheet = observer(function ScoringSheet({
 		window.addEventListener("keydown", handleKeyPress);
 		return () => window.removeEventListener("keydown", handleKeyPress);
 	}, [save]);
+	
+	useBlocker({
+    shouldBlockFn: () => {
+      if (!unsaved$.get()) return false
+
+      const shouldLeave = confirm('Are you sure you want to leave? You have unsaved changes.')
+      return !shouldLeave
+    },
+  })
 
 	return (
 		<form>
