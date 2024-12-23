@@ -8,11 +8,12 @@ import { scoringSheets$ } from "../state/observables";
 
 export const Route = createFileRoute("/app/local-sheet/$sheetId")({
 	component: RouteComponent,
+	ssr: false
 });
 
-// TODO: i only want to run this on the client. stop trying to ssr stuff
 
 function RouteComponent() {
+  // TODO: idk what the best way to do this is, but we basically need to watch the sheetId param and get a new sheet$ when it changes
 	const data = Route.useParams();
 	const sheetId = data.sheetId;
 	const sheet$ = scoringSheets$.sheets.find(

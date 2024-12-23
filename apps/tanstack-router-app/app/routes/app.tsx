@@ -121,5 +121,6 @@ const RouteComponent = observer(function RouteComponent() {
 });
 
 export const Route = createFileRoute("/app")({
-	component: RouteComponent,
-});
+  component: RouteComponent,
+  ssr: false
+})
